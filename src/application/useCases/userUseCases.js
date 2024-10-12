@@ -1,4 +1,4 @@
-const { User, Company } = require("../../domain/entities/user");
+const { User } = require("../../domain/entities/User");
 const {
   validateEmail,
   validatePassword,
@@ -71,21 +71,25 @@ class UserUseCases {
 
   async getAllUsers() {
     try {
+      if (!this.userRepository) {
+        throw new Error("User repository is not initialized");
+      }
+      if (typeof this.userRepository.findAll !== "function") {
+        throw new Error(
+          "findAll method is not implemented in the user repository"
+        );
+      }
       return await this.userRepository.findAll();
     } catch (error) {
       throw new Error(`Error fetching all users: ${error.message}`);
     }
   }
 
-  async getUserById(id) {
+  async getAllUsers() {
     try {
-      const user = await this.userRepository.findById(id);
-      if (!user) {
-        throw new Error("User not found");
-      }
-      return user;
+      return await this.userRepository.findAll();
     } catch (error) {
-      throw new Error(`Error fetching user by ID: ${error.message}`);
+      throw new Error(`Error fetching all users: ${error.message}`);
     }
   }
 
