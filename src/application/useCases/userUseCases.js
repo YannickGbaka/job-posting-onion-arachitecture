@@ -147,4 +147,6 @@ class UserUseCases {
   }
 }
 
-module.exports = UserUseCases;
+module.exports = {
+  UserUseCases,
+};

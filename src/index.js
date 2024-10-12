@@ -4,11 +4,14 @@ const InMemoryTodoRepository = require("./infrastructure/database/inMemoryTodoRe
 const InMemoryUserRepository = require("./infrastructure/database/inMemoryUserRepository");
 const MongoUserRepository = require("./infrastructure/database/mongoUserRepository");
 const TodoUseCases = require("./application/useCases/todoUseCases");
-const UserUseCases = require("./application/useCases/userUseCases");
+const { UserUseCases } = require("./application/useCases/userUseCases");
 const TodoController = require("./infrastructure/webApi/controllers/todoController");
 const UserController = require("./infrastructure/webApi/controllers/userController");
 const todoRoutes = require("./infrastructure/webApi/routes/todoRoutes");
 const userRoutes = require("./infrastructure/webApi/routes/userRoutes");
+const AuthUseCases = require("./application/useCases/authUseCases");
+const AuthController = require("./infrastructure/webApi/controllers/authController");
+const authRoutes = require("./infrastructure/webApi/routes/authRoutes");
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -46,9 +49,12 @@ async function initializeApp() {
 
   const userUseCases = new UserUseCases(userRepository);
   const userController = new UserController(userUseCases);
+  const authUseCases = new AuthUseCases(userRepository);
+  const authController = new AuthController(authUseCases);
 
   // Routes
-  app.use("/users", userRoutes(userController));
+  app.use("/api/users", userRoutes(userController));
+  app.use("/api/auth", authRoutes(authController));
 
   app.listen(port, () => {
     console.log(`API listening at http://localhost:${port}`);

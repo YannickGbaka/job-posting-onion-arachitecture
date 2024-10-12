@@ -1,3 +1,7 @@
+const {
+  authenticateUser,
+} = require("../../../application/useCases/userUseCases");
+
 class UserController {
   constructor(userUseCases) {
     this.userUseCases = userUseCases;
@@ -58,6 +62,17 @@ class UserController {
       res.status(400).json({ error: error.message });
     }
   }
+
+  login = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      console.log(email, password);
+      const result = await authenticateUser(email, password);
+      res.json(result);
+    } catch (error) {
+      res.status(401).json({ error: error.message });
+    }
+  };
 }
 
 module.exports = UserController;
