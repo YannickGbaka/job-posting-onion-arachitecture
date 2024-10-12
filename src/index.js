@@ -12,11 +12,20 @@ const userRoutes = require("./infrastructure/webApi/routes/userRoutes");
 const AuthUseCases = require("./application/useCases/authUseCases");
 const AuthController = require("./infrastructure/webApi/controllers/authController");
 const authRoutes = require("./infrastructure/webApi/routes/authRoutes");
-
+const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3001;
+const MongoJobRepository = require("./infrastructure/database/mongoJobRepository");
+const JobUseCases = require("./application/useCases/jobUseCases");
+const JobController = require("./infrastructure/webApi/controllers/jobController");
+const jobRoutes = require("./infrastructure/webApi/routes/jobRoutes");
 
 app.use(express.json());
+app.use(
+  cors({
+    origin: "*", // or your frontend's production URL
+  })
+);
 
 // User repository factory
 const createUserRepository = () => {
@@ -49,17 +58,40 @@ async function initializeApp() {
 
   const userUseCases = new UserUseCases(userRepository);
   const userController = new UserController(userUseCases);
+
   const authUseCases = new AuthUseCases(userRepository);
   const authController = new AuthController(authUseCases);
 
+  const jobRepository = createJobRepository();
+
+  const jobUseCases = new JobUseCases(jobRepository);
+  const jobController = new JobController(jobUseCases);
+
+  // Add job routes
   // Routes
-  app.use("/api/users", userRoutes(userController));
   app.use("/api/auth", authRoutes(authController));
+  app.use("/api/users", userRoutes(userController));
+  app.use("/api/jobs", jobRoutes(jobController));
+  //cors
+  // app.use(cors({ origin: "*" }));
 
   app.listen(port, () => {
     console.log(`API listening at http://localhost:${port}`);
   });
 }
+
+const createJobRepository = () => {
+  const useMongoDb = process.env.USE_MONGODB === "true";
+  if (useMongoDb) {
+    const mongoRepo = new MongoJobRepository(
+      process.env.MONGODB_URL,
+      "jobs",
+      "jobs"
+    );
+    mongoRepo.connect();
+    return mongoRepo;
+  }
+};
 
 initializeApp().catch(console.error);
 
