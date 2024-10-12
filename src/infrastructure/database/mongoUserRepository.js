@@ -36,10 +36,12 @@ class MongoUserRepository {
           user.password,
           user.firstName,
           user.lastName,
+          user.phoneNumber,
           user.userType,
           user.address,
+          user.linkedin,
           user.companyName,
-          user.industry,
+          user.companyIndustry,
           user.website
         )
       : null;
@@ -54,10 +56,12 @@ class MongoUserRepository {
           user.password,
           user.firstName,
           user.lastName,
+          user.phoneNumber,
           user.userType,
           user.address,
+          user.linkedin,
           user.companyName,
-          user.industry,
+          user.companyIndustry,
           user.website
         )
       : null;
@@ -73,10 +77,12 @@ class MongoUserRepository {
           user.password,
           user.firstName,
           user.lastName,
+          user.phoneNumber,
           user.userType,
           user.address,
+          user.linkedin,
           user.companyName,
-          user.industry,
+          user.companyIndustry,
           user.website
         )
     );

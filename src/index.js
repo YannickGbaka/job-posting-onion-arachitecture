@@ -19,6 +19,9 @@ const MongoJobRepository = require("./infrastructure/database/mongoJobRepository
 const JobUseCases = require("./application/useCases/jobUseCases");
 const JobController = require("./infrastructure/webApi/controllers/jobController");
 const jobRoutes = require("./infrastructure/webApi/routes/jobRoutes");
+const MongoApplicationRepository = require("./infrastructure/database/mongoApplicationRepository");
+const ApplicationUseCases = require("./application/useCases/applicationUseCases");
+const ApplicationController = require("./infrastructure/webApi/controllers/applicationController");
 
 app.use(express.json());
 app.use(
@@ -63,9 +66,13 @@ async function initializeApp() {
   const authController = new AuthController(authUseCases);
 
   const jobRepository = createJobRepository();
+  const applicationRepository = createApplicationRepository();
 
   const jobUseCases = new JobUseCases(jobRepository);
   const jobController = new JobController(jobUseCases);
+
+  const applicationUseCases = new ApplicationUseCases(applicationRepository);
+  const applicationController = new ApplicationController(applicationUseCases);
 
   // Add job routes
   // Routes
@@ -90,6 +97,17 @@ const createJobRepository = () => {
     );
     mongoRepo.connect();
     return mongoRepo;
+  }
+};
+
+const createApplicationRepository = () => {
+  const useMongoDb = process.env.USE_MONGODB === "true";
+  if (useMongoDb) {
+    const mongoRepo = new MongoApplicationRepository(
+      process.env.MONGODB_URL,
+      "jobs",
+      "applications"
+    );
   }
 };
 
