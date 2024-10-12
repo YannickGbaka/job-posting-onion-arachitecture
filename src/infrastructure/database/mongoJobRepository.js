@@ -96,9 +96,7 @@ class MongoJobRepository {
   }
 
   async delete(id) {
-    const result = await this.database
-      .collection("jobs")
-      .deleteOne({ _id: id });
+    const result = await this.collection.deleteOne({ _id: new ObjectId(id) });
     return result.deletedCount > 0;
   }
 }
