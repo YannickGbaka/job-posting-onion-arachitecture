@@ -6,10 +6,11 @@ class JobController {
   async createJob(req, res) {
     try {
       const jobData = req.body;
+      console.log("jobData", jobData);
       const newJob = await this.jobUseCases.createJob(jobData);
       res.status(201).json(newJob);
     } catch (error) {
-      res.status(500).json({ error: "Error creating job" });
+      res.status(500).json({ error: error.message });
     }
   }
 

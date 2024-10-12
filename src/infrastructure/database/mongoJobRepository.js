@@ -33,7 +33,7 @@ class MongoJobRepository {
     const requiredFields = [
       "title",
       "description",
-      "salary",
+      // "salary",
       "location",
       "requirements",
       "jobType",
@@ -46,7 +46,7 @@ class MongoJobRepository {
   }
 
   async findById(id) {
-    const job = await this.collection.findOne({ _id: id });
+    const job = await this.collection.findOne({ _id: new ObjectId(id) });
     if (!job) return null;
     return new Job(
       job._id,
