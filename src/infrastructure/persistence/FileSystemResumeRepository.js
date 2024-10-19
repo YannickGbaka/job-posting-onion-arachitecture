@@ -4,6 +4,7 @@ const pdf = require("pdf-parse");
 const mammoth = require("mammoth");
 const Resume = require("../../domain/resume/Resume.js");
 const ResumeRepository = require("../../domain/resume/ResumeRepository.js");
+const ResumeMatchingService = require("../../domain/services/ResumeMatchingService.js");
 
 const CV_DIRECTORY = path.join("src", "public", "cv");
 
@@ -61,6 +62,27 @@ class FileSystemResumeRepository extends ResumeRepository {
   async _readWord(filePath) {
     const result = await mammoth.extractRawText({ path: filePath });
     return result.value;
+  }
+
+  async findMatchingResumes(jobOffer) {
+    const allResumes = await this.getAllResumes();
+    const matchingResumes = [];
+
+    for (const resume of allResumes) {
+      const content = await this.getResumeContent(resume.fileName);
+      const { isMatch, score, matchedKeywords } =
+        ResumeMatchingService.isJobOfferMatch(content, jobOffer);
+
+      if (isMatch) {
+        matchingResumes.push({
+          resume,
+          score,
+          matchedKeywords,
+        });
+      }
+    }
+
+    return matchingResumes.sort((a, b) => b.score - a.score);
   }
 }
 

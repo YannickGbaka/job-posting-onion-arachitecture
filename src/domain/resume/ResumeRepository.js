@@ -10,6 +10,10 @@ class ResumeRepository {
   async getResumeContent(fileName) {
     throw new Error("Method not implemented");
   }
+
+  async findMatchingResumes(jobOffer) {
+    throw new Error("Method not implemented");
+  }
 }
 
 module.exports = ResumeRepository;

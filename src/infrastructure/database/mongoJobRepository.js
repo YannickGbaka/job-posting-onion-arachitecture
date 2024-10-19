@@ -46,6 +46,7 @@ class MongoJobRepository {
   }
 
   async findById(id) {
+    await this.connect();
     const job = await this.collection.findOne({ _id: new ObjectId(id) });
     if (!job) return null;
     return new Job(

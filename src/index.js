@@ -24,6 +24,12 @@ const ApplicationUseCases = require("./application/useCases/applicationUseCases"
 const ApplicationController = require("./infrastructure/webApi/controllers/applicationController");
 const applicationRoutes = require("./infrastructure/webApi/routes/applicationRoutes");
 const resumeRoutes = require("./infrastructure/webApi/routes/resumeRoutes");
+const ResumeController = require("./infrastructure/webApi/controllers/ResumeController");
+const GetAllResumesUseCase = require("./application/useCases/ResumesUseCases");
+const FindMatchingResumesUseCase = require("./application/useCase/FindMatchingResumesUseCase");
+const VectorizeCVUseCase = require("./application/useCase/VectorizeCVUseCase");
+const FileSystemResumeRepository = require("./infrastructure/persistence/FileSystemResumeRepository");
+const OllamaServiceImpl = require("./infrastructure/ai/OllamaServiceImpl");
 
 app.use(express.json());
 app.use(
@@ -67,41 +73,48 @@ async function initializeApp() {
   const authUseCases = new AuthUseCases(userRepository);
   const authController = new AuthController(authUseCases);
 
-  const jobRepository = createJobRepository();
-  const applicationRepository = createApplicationRepository();
-
+  const jobRepository = new MongoJobRepository(
+    process.env.MONGODB_URL,
+    "jobs",
+    "jobs"
+  );
   const jobUseCases = new JobUseCases(jobRepository);
   const jobController = new JobController(jobUseCases);
 
+  const applicationRepository = createApplicationRepository();
+
   const applicationUseCases = new ApplicationUseCases(applicationRepository);
   const applicationController = new ApplicationController(applicationUseCases);
+  const resumeRepository = new FileSystemResumeRepository();
+  const ollamaService = new OllamaServiceImpl();
+  const getAllResumesUseCase = new GetAllResumesUseCase(resumeRepository);
+  const findMatchingResumesUseCase = new FindMatchingResumesUseCase(
+    resumeRepository
+  );
+  const vectorizeCVUseCase = new VectorizeCVUseCase(
+    resumeRepository,
+    ollamaService
+  );
 
-  // Add job routes
+  const resumeController = new ResumeController(
+    getAllResumesUseCase,
+    findMatchingResumesUseCase,
+    vectorizeCVUseCase,
+    jobUseCases
+  );
+
   // Routes
   app.use("/api/auth", authRoutes(authController));
   app.use("/api/users", userRoutes(userController));
   app.use("/api/jobs", jobRoutes(jobController));
   app.use("/api/applications", applicationRoutes(applicationController));
-  app.use("/api/resumes", resumeRoutes);
+  app.use("/api/resumes", resumeRoutes(resumeController, jobRepository));
 
   app.listen(port, () => {
     // app.use(cors({ origin: "*" })); //cors
     console.log(`API listening at http://localhost:${port}`);
   });
 }
-
-const createJobRepository = () => {
-  const useMongoDb = process.env.USE_MONGODB === "true";
-  if (useMongoDb) {
-    const mongoRepo = new MongoJobRepository(
-      process.env.MONGODB_URL,
-      "jobs",
-      "jobs"
-    );
-    mongoRepo.connect();
-    return mongoRepo;
-  }
-};
 
 const createApplicationRepository = () => {
   const useMongoDb = process.env.USE_MONGODB === "true";

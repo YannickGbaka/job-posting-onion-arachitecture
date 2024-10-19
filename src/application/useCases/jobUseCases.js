@@ -9,7 +9,11 @@ class JobUseCases {
   }
 
   async getJobById(id) {
-    return this.jobRepository.findById(id);
+    const job = await this.jobRepository.findById(id);
+    if (!job) {
+      throw new Error("Job not found");
+    }
+    return job;
   }
 
   async getAllJobs() {
