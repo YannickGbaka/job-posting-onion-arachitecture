@@ -46,15 +46,15 @@ class ResumeController {
 
   async vectorizeCV(req, res) {
     try {
-      const { resumeId, jobOfferKeywords } = req.body;
-      if (!resumeId || !jobOfferKeywords) {
+      const { resumePath, keywords } = req.body;
+      if ((!resumePath, keywords)) {
         return res
           .status(400)
           .json({ error: "Resume ID and job offer keywords are required" });
       }
       const vectorizedCV = await this.vectorizeCVUseCase.execute(
-        resumeId,
-        jobOfferKeywords
+        resumePath,
+        keywords
       );
       res.json(vectorizedCV);
     } catch (error) {
