@@ -33,6 +33,10 @@ class ApplicationUseCases {
     application.updateStatus(newStatus);
     return this.applicationRepository.update(id, application);
   }
+
+  async getAllApplications() {
+    return this.applicationRepository.findAll();
+  }
 }
 
 module.exports = ApplicationUseCases;

@@ -31,6 +31,11 @@ class MongoApplicationRepository {
     return results.map((result) => new Application(result));
   }
 
+  async findAll() {
+    const results = await this.collection.find().toArray();
+    return results.map((result) => new Application(result));
+  }
+
   async update(id, application) {
     await this.collection.updateOne(
       { _id: new ObjectId(id) },

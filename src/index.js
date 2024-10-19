@@ -22,6 +22,8 @@ const jobRoutes = require("./infrastructure/webApi/routes/jobRoutes");
 const MongoApplicationRepository = require("./infrastructure/database/mongoApplicationRepository");
 const ApplicationUseCases = require("./application/useCases/applicationUseCases");
 const ApplicationController = require("./infrastructure/webApi/controllers/applicationController");
+const applicationRoutes = require("./infrastructure/webApi/routes/applicationRoutes");
+const resumeRoutes = require("./infrastructure/webApi/routes/resumeRoutes");
 
 app.use(express.json());
 app.use(
@@ -79,10 +81,11 @@ async function initializeApp() {
   app.use("/api/auth", authRoutes(authController));
   app.use("/api/users", userRoutes(userController));
   app.use("/api/jobs", jobRoutes(jobController));
-  //cors
-  // app.use(cors({ origin: "*" }));
+  app.use("/api/applications", applicationRoutes(applicationController));
+  app.use("/api/resumes", resumeRoutes);
 
   app.listen(port, () => {
+    // app.use(cors({ origin: "*" })); //cors
     console.log(`API listening at http://localhost:${port}`);
   });
 }
