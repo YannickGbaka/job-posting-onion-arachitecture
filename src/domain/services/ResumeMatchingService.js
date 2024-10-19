@@ -84,7 +84,7 @@ class ResumeMatchingService {
     const threshold = keywords.length * 0.1;
     const isMatch = matchScore >= threshold;
 
-    return { isMatch, score: matchScore, matchedKeywords };
+    return { isMatch, score: matchScore, matchedKeywords, keywords };
   }
 
   static escapeRegExp(string) {

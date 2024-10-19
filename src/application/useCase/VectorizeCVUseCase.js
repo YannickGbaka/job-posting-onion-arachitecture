@@ -1,4 +1,5 @@
 const OllamaService = require("../../domain/services/OllamaService");
+const Resume = require("../../domain/resume/Resume");
 
 class VectorizeCVUseCase {
   constructor(resumeRepository, ollamaService) {
@@ -6,11 +7,14 @@ class VectorizeCVUseCase {
     this.ollamaService = ollamaService;
   }
 
-  async execute(resumeId, jobOfferKeywords) {
-    const resume = await this.resumeRepository.getResumeById(resumeId);
-    if (!resume) {
-      throw new Error("Resume not found");
+  async execute(fileName, jobOfferKeywords) {
+    const content = await this.resumeRepository.getResumeContent(fileName);
+
+    if (!content) {
+      throw new Error("Resume not found or couldn't be read");
     }
+
+    const resume = new Resume(null, fileName, content);
 
     const vector = this.vectorize(resume.content, jobOfferKeywords);
     const contactInfo = await this.extractContactInfo(resume.content);
@@ -56,7 +60,7 @@ class VectorizeCVUseCase {
 
   extractContactInfoRegex(content) {
     const phoneRegex =
-      /(?:(?:\+|00)33|0)\s*[1-9](?:(?:[\s.-]*\d{2}){4}|\d{2}(?:[\s.-]*\d{3}){2})/g;
+      /(?:(?:\+|00)(?:33|225)|0)\s*[1-9](?:(?:[\s.-]*\d{2}){4}|\d{2}(?:[\s.-]*\d{3}){2})/g;
     const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 
     const phoneMatches = content.match(phoneRegex);
@@ -66,7 +70,12 @@ class VectorizeCVUseCase {
     if (phoneMatches) {
       phone = phoneMatches[0].replace(/\s+/g, "").replace(/^00/, "+");
       if (phone.startsWith("0")) {
-        phone = "+33" + phone.slice(1);
+        // Check if it's a Côte d'Ivoire number (8 digits after the leading 0)
+        if (phone.length === 10) {
+          phone = "+225" + phone.slice(1);
+        } else {
+          phone = "+33" + phone.slice(1);
+        }
       }
     }
 

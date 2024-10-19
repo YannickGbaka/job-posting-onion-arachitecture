@@ -70,7 +70,7 @@ class FileSystemResumeRepository extends ResumeRepository {
 
     for (const resume of allResumes) {
       const content = await this.getResumeContent(resume.fileName);
-      const { isMatch, score, matchedKeywords } =
+      const { isMatch, score, matchedKeywords, keywords } =
         ResumeMatchingService.isJobOfferMatch(content, jobOffer);
 
       if (isMatch) {
@@ -78,6 +78,7 @@ class FileSystemResumeRepository extends ResumeRepository {
           resume,
           score,
           matchedKeywords,
+          keywords,
         });
       }
     }
