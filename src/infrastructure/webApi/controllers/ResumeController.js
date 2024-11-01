@@ -47,7 +47,7 @@ class ResumeController {
   async vectorizeCV(req, res) {
     try {
       const { resumePath, keywords } = req.body;
-      if ((!resumePath, keywords)) {
+      if (!(resumePath, keywords)) {
         return res
           .status(400)
           .json({ error: "Resume ID and job offer keywords are required" });

@@ -19,8 +19,8 @@ class VectorizeCVUseCase {
     const vector = this.vectorize(resume.content, jobOfferKeywords);
     const contactInfo = await this.extractContactInfo(resume.content);
     const analysis = await this.ollamaService.processFile(
-      resume.fileName,
-      "Analyze this CV and provide a summary of the candidate's skills and experience."
+      "src/public/cv/" + resume.fileName,
+      "Analyse ce cv et fournis un résumé de la personne et de ses compétences."
     );
 
     return {
@@ -47,10 +47,15 @@ class VectorizeCVUseCase {
     const prompt = `Extract contact information (phone and email) from this CV. Respond only with a JSON object containing the keys "phone" and "email". If information is not found, set null for that key.
 
     CV content:
-    ${content}`;
+    ${content}
+    
+    avoid saying things like "Here is the contact information:" or anything similar.
+    just return the JSON object.
+    `;
 
     try {
       const response = await this.ollamaService.generateResponse(prompt);
+      console.log(response);
       return JSON.parse(response);
     } catch (error) {
       console.error("Error extracting contact info using AI:", error);

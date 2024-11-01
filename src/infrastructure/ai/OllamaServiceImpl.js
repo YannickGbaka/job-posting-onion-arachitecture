@@ -1,6 +1,6 @@
 const { AxiosService } = require("coddyger");
-const fs = require("fs").promises;
 const dotenv = require("dotenv");
+const FileSystemResumeRepository = require("../persistence/FileSystemResumeRepository");
 
 dotenv.config();
 
@@ -12,6 +12,8 @@ class OllamaServiceImpl extends OllamaService {
     const ollamaEndpoint =
       process.env.OLLAMA_ENDPOINT || "http://localhost:11434/api";
     this.axiosService = AxiosService.connect(ollamaEndpoint);
+    this.axiosService.defaults.timeout = 40000000; // Increase timeout to 2 minutes (120 seconds)
+    this.fileSystemRepository = new FileSystemResumeRepository();
   }
 
   async generateResponse(prompt, model = "llama3.2:latest") {
@@ -20,7 +22,7 @@ class OllamaServiceImpl extends OllamaService {
         model: model,
         prompt: prompt,
         stream: false,
-      });
+      });Console.log("");
 
       if (response.data && response.data.response) {
         return response.data.response;
@@ -49,7 +51,7 @@ class OllamaServiceImpl extends OllamaService {
 
   async processFile(filePath, prompt, model = "llama3.2:latest") {
     try {
-      const fileContent = await fs.readFile(filePath, "utf-8");
+      const fileContent = await this.fileSystemRepository._readPdf(filePath);
       const fullPrompt = `${prompt}\n\nFile content:\n${fileContent}`;
 
       return await this.generateResponse(fullPrompt, model);
