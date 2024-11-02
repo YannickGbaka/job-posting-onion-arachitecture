@@ -1,39 +1,15 @@
-const express = require("express");
+const express = require('express');
 
 function applicationRoutes(applicationController) {
-  const router = express.Router();
+    const router = express.Router();
 
-  // Get all applications
-  router.get(
-    "/",
-    applicationController.getAllApplications.bind(applicationController)
-  );
+    router.post('/', (req, res) => applicationController.createApplication(req, res));
+    router.get('/user/:userId', (req, res) => applicationController.getUserApplications(req, res));
+    router.get('/:id', (req, res) => applicationController.getApplicationById(req, res));
+    router.put('/:id/status', (req, res) => applicationController.updateApplicationStatus(req, res));
+    router.get('/', (req, res) => applicationController.getAllApplications(req, res));
 
-  // Get application by ID
-  router.get(
-    "/:id",
-    applicationController.getApplicationById.bind(applicationController)
-  );
-
-  // Create a new application
-  router.post(
-    "/",
-    applicationController.createApplication.bind(applicationController)
-  );
-
-  // Update an application
-  router.put(
-    "/:id",
-    applicationController.updateApplication.bind(applicationController)
-  );
-
-  // Delete an application
-  router.delete(
-    "/:id",
-    applicationController.deleteApplication.bind(applicationController)
-  );
-
-  return router;
+    return router;
 }
 
 module.exports = applicationRoutes;

@@ -50,41 +50,14 @@ class MongoUserRepository {
   async findById(id) {
     const user = await this.collection.findOne({ _id: new ObjectId(id) });
     return user
-      ? new User(
-          user._id.toString(),
-          user.email,
-          user.password,
-          user.firstName,
-          user.lastName,
-          user.phoneNumber,
-          user.userType,
-          user.address,
-          user.linkedin,
-          user.companyName,
-          user.companyIndustry,
-          user.website
-        )
+      ? {...user}
       : null;
   }
 
   async findAll() {
     const users = await this.collection.find().toArray();
     return users.map(
-      (user) =>
-        new User(
-          user._id.toString(),
-          user.email,
-          user.password,
-          user.firstName,
-          user.lastName,
-          user.phoneNumber,
-          user.userType,
-          user.address,
-          user.linkedin,
-          user.companyName,
-          user.companyIndustry,
-          user.website
-        )
+      (user) => ({...user}) 
     );
   }
 

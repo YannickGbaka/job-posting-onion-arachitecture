@@ -10,18 +10,21 @@ class UserUseCases {
   }
 
   async registerUser(userData) {
+    console.log(userData)
     const { email, password, confirmPassword, userType } = userData;
 
     if (!validateEmail(email)) {
       throw new Error("Invalid email format");
     }
 
-    if (!validatePassword(password)) {
-      throw new Error("Password does not meet requirements");
-    }
+    if (password) {
+      if (!validatePassword(password)) {
+        throw new Error("Password does not meet requirements");
+      }
 
-    if (password !== confirmPassword) {
-      throw new Error("Passwords do not match");
+      if (password !== confirmPassword) {
+        throw new Error("Passwords do not match");
+      }
     }
 
     const existingUser = await this.userRepository.findByEmail(email);
@@ -40,23 +43,37 @@ class UserUseCases {
           );
         }
         newUser = new User(
-          null,
           email,
           password,
-          userData.firstName,
-          userData.lastName,
+          userData.firstName || null,
+          userData.lastName  || null,
+          userData.phoneNumber || null,
           userType,
-          userData.address,
+          userData.address || null ,
+          userData.linkedin || null,
           companyName,
-          industry,
-          userData.website
+          companyIndustry,
+          userData.website || null
         );
+        console.log(newUser)
         break;
       case "User":
-        newUser = new User(email, password);
+        newUser = new User(
+          email,
+          userData.password || password,
+          userData.firstName || null,
+          userData.lastName  || null,
+          userData.phoneNumber || null,
+          userType,
+          userData.address || null ,
+          userData.linkedin || null,
+          userData.companyName || null, 
+          userData.companyIndustry || null,
+          userData.website || null
+        );
+        console.log("new" + newUser)
         break;
       case "Admin":
-        // Assuming Admin creation is a protected operation
         throw new Error(
           "Admin users cannot be created through regular registration"
         );
@@ -143,6 +160,19 @@ class UserUseCases {
       return user;
     } catch (error) {
       throw new Error(`Error fetching user by email: ${error.message}`);
+    }
+  }
+
+  async findOrCreateUser(userData) {
+    try {
+      let user = await this.userRepository.findByEmail(userData.email);
+      if (!user) {  
+        user = await this.registerUser({'userType': 'User', ...userData});
+      }
+      console.log(user)
+      return user;
+    } catch (error) {
+      throw new Error(`Error in findOrCreateUser: ${error.message}`);
     }
   }
 }

@@ -1,3 +1,5 @@
+const Application = require('../../domain/entities/Application')
+
 class ApplicationUseCases {
   constructor(applicationRepository, userRepository, jobRepository) {
     this.applicationRepository = applicationRepository;
@@ -8,7 +10,7 @@ class ApplicationUseCases {
   async createApplication(applicationData) {
     const user = await this.userRepository.findById(applicationData.userId);
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("User not found");  
     }
 
     const job = await this.jobRepository.findById(applicationData.jobId);

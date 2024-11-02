@@ -22,11 +22,21 @@ class MongoJobRepository {
   }
 
   async create(job) {
-    // Validate that all required fields are present
-    this.validateJob(job);
+    try {
+        // S'assurer que la connexion est établie
+        if (!this.client) {
+            await this.connect();
+        }
+        
+        // Validate that all required fields are present
+        this.validateJob(job);
 
-    const result = await this.collection.insertOne(job);
-    return { ...job, id: result.insertedId.toString() };
+        const result = await this.collection.insertOne(job);
+        return { ...job, id: result.insertedId.toString() };
+    } catch (error) {
+        console.error("Error creating job:", error);
+        throw error;
+    }
   }
 
   validateJob(job) {
