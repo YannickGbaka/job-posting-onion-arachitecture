@@ -39,6 +39,15 @@ class ApplicationUseCases {
   async getAllApplications() {
     return this.applicationRepository.findAll();
   }
+
+  async deleteApplication(applicationId) {
+    if (!applicationId) {
+        throw new Error('Application ID is required');
+    }
+    
+    await this.applicationRepository.delete(applicationId);
+    return true;
+  }
 }
 
 module.exports = ApplicationUseCases;

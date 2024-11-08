@@ -8,6 +8,7 @@ function applicationRoutes(applicationController) {
     router.get('/:id', (req, res) => applicationController.getApplicationById(req, res));
     router.put('/:id/status', (req, res) => applicationController.updateApplicationStatus(req, res));
     router.get('/', (req, res) => applicationController.getAllApplications(req, res));
+    router.delete('/:id', (req, res) => applicationController.deleteApplication(req, res));
 
     return router;
 }

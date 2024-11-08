@@ -1,6 +1,5 @@
-const multer = require('multer');
-const path = require('path');
-
+const multer = require("multer");
+const path = require("path");
 
 class ApplicationController {
   constructor(applicationUseCases, userUseCases) {
@@ -12,50 +11,64 @@ class ApplicationController {
   configureMulter() {
     const storage = multer.diskStorage({
       destination: function (req, file, cb) {
-        cb(null, 'src/public/resumes')
+        cb(null, "src/public/resumes");
       },
       filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        cb(null, uniqueSuffix + path.extname(file.originalname))
-      }
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+      },
     });
 
-    return multer({ 
+    return multer({
       storage: storage,
       fileFilter: (req, file, cb) => {
-        const allowedTypes = ['.pdf', '.doc', '.docx'];
+        const allowedTypes = [".pdf", ".doc", ".docx"];
         const ext = path.extname(file.originalname).toLowerCase();
         if (allowedTypes.includes(ext)) {
           cb(null, true);
         } else {
-          cb(new Error('Invalid file type. Only PDF and Word documents are allowed.'));
+          cb(
+            new Error(
+              "Invalid file type. Only PDF and Word documents are allowed."
+            )
+          );
         }
       },
       limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
-      }
+        fileSize: 5 * 1024 * 1024, // 5MB limit
+      },
     });
   }
 
   async createApplication(req, res) {
     try {
-      this.upload.single('resumeFile')(req, res, async (err) => {
+      this.upload.single("resumeFile")(req, res, async (err) => {
         if (err) {
           return res.status(400).json({ error: err.message });
         }
 
-        // This is a valid syntax in JavaScript, specifically in ES6 and later versions. 
-        // It is using object destructuring to extract specific properties from the req.body object.
-        // The syntax { email, jobId, coverLetter, ...userData } is called "rest syntax" or "object rest syntax".
-        // It extracts the specified properties (email, jobId, coverLetter) and assigns the remaining properties to the userData object.
         const { jobId, coverLetter, ...userData } = req.body;
         const resumeFile = req.file ? req.file.filename : null;
 
-        if (!userData.email || !jobId) {
-          return res.status(400).json({ 
+        if (
+          !userData.email ||
+          !jobId ||
+          !userData.firstName ||
+          !userData.lastName ||
+          !userData.phoneNumber ||
+          !userData.address
+        ) {
+          return res.status(400).json({
             error: "Missing required fields",
-            required: ["email", "jobId"] 
-          }); 
+            required: [
+              "email",
+              "jobId",
+              "firstName",
+              "lastName",
+              "phoneNumber",
+              "address",
+            ],
+          });
         }
 
         // First, try to find or create the user
@@ -63,9 +76,9 @@ class ApplicationController {
         try {
           user = await this.userUseCases.findOrCreateUser(userData);
         } catch (error) {
-          return res.status(400).json({ 
+          return res.status(400).json({
             error: "Error processing user data",
-            details: error.message 
+            details: error.message,
           });
         }
 
@@ -73,7 +86,7 @@ class ApplicationController {
           userId: user.id, // Use the user ID from the found/created user
           jobId,
           resumeFile,
-          coverLetter
+          coverLetter,
         });
 
         res.status(201).json(application);
@@ -125,9 +138,13 @@ class ApplicationController {
   }
 
   async deleteApplication(req, res) {
-    const { id } = req.params;
-    await this.applicationUseCases.deleteApplication(id);
-    res.status(200).json({ message: "Application deleted successfully" });
+    try {
+      const { id } = req.params;
+      await this.applicationUseCases.deleteApplication(id);
+      res.status(200).json({ message: 'Application deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
 
   async getAllApplications(req, res) {
