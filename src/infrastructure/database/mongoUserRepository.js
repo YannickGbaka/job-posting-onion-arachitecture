@@ -49,16 +49,12 @@ class MongoUserRepository {
 
   async findById(id) {
     const user = await this.collection.findOne({ _id: new ObjectId(id) });
-    return user
-      ? {...user}
-      : null;
+    return user ? { ...user } : null;
   }
 
   async findAll() {
     const users = await this.collection.find().toArray();
-    return users.map(
-      (user) => ({...user}) 
-    );
+    return users.map((user) => ({ ...user }));
   }
 
   async update(user) {
