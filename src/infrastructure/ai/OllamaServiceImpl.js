@@ -22,7 +22,8 @@ class OllamaServiceImpl extends OllamaService {
         model: model,
         prompt: prompt,
         stream: false,
-      });Console.log("");
+      });
+      console.log("");
 
       if (response.data && response.data.response) {
         return response.data.response;
