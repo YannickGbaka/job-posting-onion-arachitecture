@@ -1,5 +1,6 @@
 class User {
   constructor(
+    id = null,
     email,
     password = null,
     firstName = null,
@@ -10,8 +11,9 @@ class User {
     linkedin = null,
     companyName,
     companyIndustry,
-    website = null  
+    website = null
   ) {
+    this.id = id;
     this.email = email;
     this.password = password; // Note: In a real application, never store plain text passwords
     this.firstName = firstName;
@@ -20,7 +22,7 @@ class User {
     this.userType = userType;
     this.address = address;
     this.linkedin = linkedin;
-    this.companyName = companyName; 
+    this.companyName = companyName;
     this.companyIndustry = companyIndustry;
     this.website = website;
   }

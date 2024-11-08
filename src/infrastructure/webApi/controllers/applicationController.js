@@ -81,7 +81,7 @@ class ApplicationController {
             details: error.message,
           });
         }
-
+        console.log(user.id);
         const application = await this.applicationUseCases.createApplication({
           userId: user.id, // Use the user ID from the found/created user
           jobId,
@@ -141,7 +141,7 @@ class ApplicationController {
     try {
       const { id } = req.params;
       await this.applicationUseCases.deleteApplication(id);
-      res.status(200).json({ message: 'Application deleted successfully' });
+      res.status(200).json({ message: "Application deleted successfully" });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

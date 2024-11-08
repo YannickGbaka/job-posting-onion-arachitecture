@@ -1,4 +1,4 @@
-const Application = require('../../domain/entities/Application')
+const Application = require("../../domain/entities/Application");
 
 class ApplicationUseCases {
   constructor(applicationRepository, userRepository, jobRepository) {
@@ -10,7 +10,7 @@ class ApplicationUseCases {
   async createApplication(applicationData) {
     const user = await this.userRepository.findById(applicationData.userId);
     if (!user) {
-      throw new Error("User not found");  
+      throw new Error("User not found");
     }
 
     const job = await this.jobRepository.findById(applicationData.jobId);
@@ -42,9 +42,9 @@ class ApplicationUseCases {
 
   async deleteApplication(applicationId) {
     if (!applicationId) {
-        throw new Error('Application ID is required');
+      throw new Error("Application ID is required");
     }
-    
+
     await this.applicationRepository.delete(applicationId);
     return true;
   }

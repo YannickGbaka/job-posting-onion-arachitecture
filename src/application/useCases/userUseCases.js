@@ -10,7 +10,7 @@ class UserUseCases {
   }
 
   async registerUser(userData) {
-    console.log(userData)
+    console.log("userdat", userData);
     const { email, password, confirmPassword, userType } = userData;
 
     if (!validateEmail(email)) {
@@ -46,32 +46,31 @@ class UserUseCases {
           email,
           password,
           userData.firstName || null,
-          userData.lastName  || null,
+          userData.lastName || null,
           userData.phoneNumber || null,
           userType,
-          userData.address || null ,
+          userData.address || null,
           userData.linkedin || null,
           companyName,
           companyIndustry,
           userData.website || null
         );
-        console.log(newUser)
         break;
       case "User":
         newUser = new User(
           email,
           userData.password || password,
           userData.firstName || null,
-          userData.lastName  || null,
+          userData.lastName || null,
           userData.phoneNumber || null,
           userType,
-          userData.address || null ,
+          userData.address || null,
           userData.linkedin || null,
-          userData.companyName || null, 
+          userData.companyName || null,
           userData.companyIndustry || null,
           userData.website || null
         );
-        console.log("new" + newUser)
+        console.log("new user" + newUser);
         break;
       case "Admin":
         throw new Error(
@@ -166,10 +165,10 @@ class UserUseCases {
   async findOrCreateUser(userData) {
     try {
       let user = await this.userRepository.findByEmail(userData.email);
-      if (!user) {  
-        user = await this.registerUser({'userType': 'User', ...userData});
+      if (!user) {
+        user = await this.registerUser({ userType: "User", ...userData });
       }
-      console.log(user)
+      console.log(user);
       return user;
     } catch (error) {
       throw new Error(`Error in findOrCreateUser: ${error.message}`);
