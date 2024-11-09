@@ -95,7 +95,8 @@ async function initializeApp() {
   );
   const applicationController = new ApplicationController(
     applicationUseCases,
-    userUseCases
+    userUseCases,
+    jobUseCases
   );
   const resumeRepository = new FileSystemResumeRepository();
   const ollamaService = new OllamaServiceImpl();

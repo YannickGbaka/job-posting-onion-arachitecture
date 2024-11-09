@@ -28,6 +28,7 @@ class MongoApplicationRepository {
         resumeFile: application.resumeFile,
         coverLetter: application.coverLetter,
         status: application.status,
+        score: application.score,
         createdAt: application.createdAt,
         updatedAt: application.updatedAt,
       });

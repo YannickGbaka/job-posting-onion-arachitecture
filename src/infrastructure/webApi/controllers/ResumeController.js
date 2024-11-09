@@ -1,3 +1,5 @@
+const ResumeMatchingService = require("../../../domain/services/ResumeMatchingService.js");
+
 class ResumeController {
   constructor(
     getAllResumesUseCase,
@@ -46,11 +48,17 @@ class ResumeController {
 
   async vectorizeCV(req, res) {
     try {
-      const { resumePath, keywords } = req.body;
-      if (!(resumePath, keywords)) {
+      const { resumePath, jobId } = req.body;
+      const job = this.jobUseCases.getJobById(jobId);
+
+      const jobOfferText = `${job.description} - ${job.requirements}`;
+
+      const keywords = ResumeMatchingService.extractKeywords(jobOfferText);
+
+      if (!(resumePath, jobId)) {
         return res
           .status(400)
-          .json({ error: "Resume ID and job offer keywords are required" });
+          .json({ error: "Resume ID and job offer id are required" });
       }
       const vectorizedCV = await this.vectorizeCVUseCase.execute(
         resumePath,

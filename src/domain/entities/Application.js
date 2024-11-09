@@ -6,6 +6,7 @@ class Application {
     resumeFile,
     coverLetter,
     status,
+    score,
     createdAt,
     updatedAt,
   }) {
@@ -15,6 +16,7 @@ class Application {
     this.resumeFile = resumeFile;
     this.coverLetter = coverLetter;
     this.status = status || "pending";
+    this.score = score;
     this.createdAt = createdAt || new Date();
     this.updatedAt = updatedAt || new Date();
   }
