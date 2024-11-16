@@ -31,6 +31,7 @@ const VectorizeCVUseCase = require("./application/useCase/VectorizeCVUseCase");
 const FileSystemResumeRepository = require("./infrastructure/persistence/FileSystemResumeRepository");
 const OllamaServiceImpl = require("./infrastructure/ai/OllamaServiceImpl");
 const bcrypt = require("bcrypt");
+const webCallRoutes = require("./infrastructure/webApi/routes/webCallRoutes");
 
 app.use(express.json());
 app.use(
@@ -122,6 +123,7 @@ async function initializeApp() {
   app.use("/api/jobs", jobRoutes(jobController));
   app.use("/api/applications", applicationRoutes(applicationController));
   app.use("/api/resumes", resumeRoutes(resumeController, jobRepository));
+  app.use("/api/webcall", webCallRoutes);
 
   app.listen(port, () => {
     // app.use(cors({ origin: "*" })); //cors

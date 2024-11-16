@@ -70,7 +70,7 @@ class MongoApplicationRepository {
   async findAll() {
     await this.connect();
     const applications = await this.collection.find().toArray();
-    return applications.map((app) => new Application(app));
+    return applications.map((app) => app);
   }
 
   async delete(id) {
