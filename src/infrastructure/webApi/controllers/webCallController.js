@@ -8,7 +8,6 @@ class WebCallController {
   async createWebCall(req, res) {
     try {
       const agentId = req.body.agentId || process.env.RETELL_DEFAULT_AGENT_ID;
-      console.log("agentId", agentId);
       const result = await this.retellService.createWebCall(agentId);
 
       if (result.success) {

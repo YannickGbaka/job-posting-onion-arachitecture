@@ -18,6 +18,7 @@ class RetellService {
         callId: webCallResponse.call_id,
         agentId: webCallResponse.agent_id,
         webCallUrl: webCallResponse.web_call_url,
+        access_token: webCallResponse.access_token,
       };
     } catch (error) {
       console.error("Error creating web call:", error);
