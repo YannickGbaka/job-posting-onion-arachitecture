@@ -1,8 +1,6 @@
-const RetellService = require("../../services/retellService");
-
 class WebCallController {
-  constructor() {
-    this.retellService = new RetellService(process.env.RETELL_API_KEY);
+  constructor(retellService) {
+    this.retellService = retellService;
   }
 
   async createWebCall(req, res) {
@@ -33,6 +31,19 @@ class WebCallController {
       } else {
         res.status(400).json(result);
       }
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  }
+
+  async getCall(req, res) {
+    try {
+      const { callId } = req.params;
+      const result = await this.retellService.getCall(callId);
+      res.json(result);
     } catch (error) {
       res.status(500).json({
         success: false,

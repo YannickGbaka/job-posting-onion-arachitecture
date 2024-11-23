@@ -43,6 +43,18 @@ class RetellService {
       };
     }
   }
+
+  async getCall(callId) {
+    try {
+      const response = await this.client.call.retrieve(callId);
+      return response;
+    } catch (e) {
+      return {
+        success: false,
+        error: e.message,
+      };
+    }
+  }
 }
 
 module.exports = RetellService;

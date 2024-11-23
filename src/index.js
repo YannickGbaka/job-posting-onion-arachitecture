@@ -30,9 +30,14 @@ const FindMatchingResumesUseCase = require("./application/useCase/FindMatchingRe
 const VectorizeCVUseCase = require("./application/useCase/VectorizeCVUseCase");
 const FileSystemResumeRepository = require("./infrastructure/persistence/FileSystemResumeRepository");
 const OllamaServiceImpl = require("./infrastructure/ai/OllamaServiceImpl");
+const MongoPhoneInterviewRepository = require("./infrastructure/database/mongoPhoneInterviewRepository");
 const bcrypt = require("bcrypt");
 const webCallRoutes = require("./infrastructure/webApi/routes/webCallRoutes");
 const path = require("path");
+const PhoneInterviewController = require("./infrastructure/webApi/controllers/phoneInterviewController");
+const phoneInterviewRoutes = require("./infrastructure/webApi/routes/phoneInterviewRoutes");
+const PhoneInterviewUseCase = require("./application/useCases/phoneInterviewUseCase");
+const RetellService = require("./infrastructure/services/retellService");
 
 app.use(express.json());
 app.use(
@@ -100,6 +105,11 @@ async function initializeApp() {
     userUseCases,
     jobUseCases
   );
+  const phoneInterviewRepository = new MongoPhoneInterviewRepository(
+    process.env.MONGODB_URL,
+    "jobs",
+    "phoneInterviews"
+  );
   const resumeRepository = new FileSystemResumeRepository();
   const ollamaService = new OllamaServiceImpl();
   const getAllResumesUseCase = new GetAllResumesUseCase(resumeRepository);
@@ -118,13 +128,28 @@ async function initializeApp() {
     jobUseCases
   );
 
+  const retellService = new RetellService(process.env.RETELL_API_KEY);
+
+  const phoneInterviewUseCase = new PhoneInterviewUseCase(
+    phoneInterviewRepository,
+    retellService
+  );
+
+  const phoneInterviewController = new PhoneInterviewController(
+    phoneInterviewUseCase
+  );
+
   // Routes
   app.use("/api/auth", authRoutes(authController));
   app.use("/api/users", userRoutes(userController));
   app.use("/api/jobs", jobRoutes(jobController));
   app.use("/api/applications", applicationRoutes(applicationController));
   app.use("/api/resumes", resumeRoutes(resumeController, jobRepository));
-  app.use("/api/webcall", webCallRoutes);
+  app.use("/api/webcall", webCallRoutes(retellService));
+  app.use(
+    "/api/phone-interviews",
+    phoneInterviewRoutes(phoneInterviewController)
+  );
 
   // Serve static files from the public directory
   app.use(express.static(path.join(__dirname, "public")));
