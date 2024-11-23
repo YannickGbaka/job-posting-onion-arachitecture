@@ -32,6 +32,7 @@ const FileSystemResumeRepository = require("./infrastructure/persistence/FileSys
 const OllamaServiceImpl = require("./infrastructure/ai/OllamaServiceImpl");
 const bcrypt = require("bcrypt");
 const webCallRoutes = require("./infrastructure/webApi/routes/webCallRoutes");
+const path = require("path");
 
 app.use(express.json());
 app.use(
@@ -124,6 +125,14 @@ async function initializeApp() {
   app.use("/api/applications", applicationRoutes(applicationController));
   app.use("/api/resumes", resumeRoutes(resumeController, jobRepository));
   app.use("/api/webcall", webCallRoutes);
+
+  // Serve static files from the public directory
+  app.use(express.static(path.join(__dirname, "public")));
+
+  // Serve the main HTML file
+  app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "views", "index.html"));
+  });
 
   app.listen(port, () => {
     // app.use(cors({ origin: "*" })); //cors
