@@ -41,6 +41,15 @@ class PhoneInterviewUseCase {
       };
     }
   }
+
+  async getAllPhoneInterviews() {
+    try {
+      const phoneInterviews = await this.phoneInterviewRepository.findAll();
+      return phoneInterviews;
+    } catch (error) {
+      throw new Error(`Error getting all phone interviews: ${error.message}`);
+    }
+  }
 }
 
 module.exports = PhoneInterviewUseCase;
