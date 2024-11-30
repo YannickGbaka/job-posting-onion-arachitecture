@@ -1,5 +1,6 @@
 class PhoneInterview {
-  constructor(userId, jobId, transcript, callDuration, transcriptObject) {
+  constructor(id, userId, jobId, transcript, callDuration, transcriptObject) {
+    this.id = id;
     this.userId = userId;
     this.jobId = jobId;
     this.transcript = transcript;

@@ -98,6 +98,7 @@ class MongoPhoneInterviewRepository {
     return interviews.map(
       (interview) =>
         new PhoneInterview(
+          interview._id.toString(),
           interview.userId,
           interview.jobId,
           interview.transcript,
