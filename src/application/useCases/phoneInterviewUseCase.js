@@ -62,6 +62,19 @@ class PhoneInterviewUseCase {
       throw new Error(`Error getting phone interview: ${error.message}`);
     }
   }
+
+  async getPhoneInterviewByUserAndJob(userId, jobId) {
+    try {
+      const phoneInterview =
+        await this.phoneInterviewRepository.findByUserIdAndJobId(userId, jobId);
+      if (!phoneInterview) {
+        throw new Error("Phone interview not found");
+      }
+      return phoneInterview;
+    } catch (error) {
+      throw new Error(`Error getting phone interview: ${error.message}`);
+    }
+  }
 }
 
 module.exports = PhoneInterviewUseCase;

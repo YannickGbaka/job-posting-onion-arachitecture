@@ -86,6 +86,27 @@ class PhoneInterviewController {
       });
     }
   }
+
+  async getPhoneInterviewByUserAndJob(req, res) {
+    try {
+      const { userId, jobId } = req.query;
+
+      if (!userId || !jobId) {
+        return res.status(400).json({
+          error: "Both userId and jobId are required query parameters",
+        });
+      }
+
+      const phoneInterview =
+        await this.phoneInterviewUseCase.getPhoneInterviewByUserAndJob(
+          userId,
+          jobId
+        );
+      res.status(200).json(phoneInterview);
+    } catch (error) {
+      res.status(404).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = PhoneInterviewController;

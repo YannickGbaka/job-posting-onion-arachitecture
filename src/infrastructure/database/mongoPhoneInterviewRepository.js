@@ -57,17 +57,27 @@ class MongoPhoneInterviewRepository {
   }
 
   async findById(id) {
-    await this.connect();
-    const interview = await this.collection.findOne({ _id: new ObjectId(id) });
-    if (!interview) return null;
+    try {
+      await this.connect();
+      const interview = await this.collection.findOne({
+        _id: new ObjectId(id),
+      });
+      if (!interview) return null;
 
-    return new PhoneInterview(
-      interview.userId,
-      interview.jobId,
-      interview.transcript,
-      interview.callDuration,
-      interview.transcriptObject
-    );
+      return new PhoneInterview(
+        interview._id.toString(),
+        interview.userId,
+        interview.jobId,
+        interview.transcript,
+        interview.callDuration,
+        interview.transcriptObject
+      );
+    } catch (error) {
+      if (error.message.includes("hex string")) {
+        throw new Error("Invalid interview ID format");
+      }
+      throw error;
+    }
   }
 
   async findByUserId(userId) {
@@ -127,6 +137,28 @@ class MongoPhoneInterviewRepository {
   async delete(id) {
     const result = await this.collection.deleteOne({ _id: new ObjectId(id) });
     return result.deletedCount > 0;
+  }
+
+  async findByUserIdAndJobId(userId, jobId) {
+    try {
+      if (!this.client) {
+        await this.connect();
+      }
+      const interview = await this.collection.findOne({ userId, jobId });
+      if (!interview) return null;
+
+      return new PhoneInterview(
+        interview._id.toString(),
+        interview.userId,
+        interview.jobId,
+        interview.transcript,
+        interview.callDuration,
+        interview.transcriptObject
+      );
+    } catch (error) {
+      console.error("Error finding interview by userId and jobId:", error);
+      throw error;
+    }
   }
 }
 

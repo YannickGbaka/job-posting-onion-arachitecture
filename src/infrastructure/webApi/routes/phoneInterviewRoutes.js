@@ -21,6 +21,9 @@ function phoneInterviewRoutes(phoneInterviewController) {
   router.post("/save-call", (req, res) =>
     phoneInterviewController.saveInterviewCall(req, res)
   );
+  router.get("/by-user-job", (req, res) =>
+    phoneInterviewController.getPhoneInterviewByUserAndJob(req, res)
+  );
 
   return router;
 }

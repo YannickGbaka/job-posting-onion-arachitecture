@@ -8,6 +8,9 @@ function quizRoutes(quizController) {
   router.post("/:quizId/submit", (req, res) =>
     quizController.submitQuizResponse(req, res)
   );
+  router.get("/job/:jobId", (req, res) =>
+    quizController.getQuizzesByJobId(req, res)
+  );
 
   return router;
 }

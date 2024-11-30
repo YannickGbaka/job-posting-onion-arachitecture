@@ -48,6 +48,20 @@ class QuizController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  async getQuizzesByJobId(req, res) {
+    try {
+      const { jobId } = req.params;
+      if (!jobId) {
+        return res.status(400).json({ error: "JobId is required" });
+      }
+
+      const quizzes = await this.quizUseCases.getQuizzesByJobId(jobId);
+      res.json(quizzes);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = QuizController;
