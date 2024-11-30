@@ -1,4 +1,4 @@
-const { AxiosService } = require("coddyger");
+const axios = require("axios");
 const dotenv = require("dotenv");
 const FileSystemResumeRepository = require("../persistence/FileSystemResumeRepository");
 
@@ -11,8 +11,10 @@ class OllamaServiceImpl extends OllamaService {
     super();
     const ollamaEndpoint =
       process.env.OLLAMA_ENDPOINT || "http://localhost:11434/api";
-    this.axiosService = AxiosService.connect(ollamaEndpoint);
-    this.axiosService.defaults.timeout = 40000000; // Increase timeout to 2 minutes (120 seconds)
+    this.axiosService = axios.create({
+      baseURL: ollamaEndpoint,
+      timeout: 40000000,
+    });
     this.fileSystemRepository = new FileSystemResumeRepository();
   }
 

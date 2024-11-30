@@ -38,6 +38,12 @@ const PhoneInterviewController = require("./infrastructure/webApi/controllers/ph
 const phoneInterviewRoutes = require("./infrastructure/webApi/routes/phoneInterviewRoutes");
 const PhoneInterviewUseCase = require("./application/useCases/phoneInterviewUseCase");
 const RetellService = require("./infrastructure/services/retellService");
+const MongoQuizRepository = require("./infrastructure/database/mongoQuizRepository");
+const MongoQuizResponseRepository = require("./infrastructure/database/mongoQuizResponseRepository");
+const QuizUseCases = require("./application/useCases/quizUseCases");
+const QuizResponseUseCases = require("./application/useCases/quizResponseUseCases");
+const QuizController = require("./infrastructure/webApi/controllers/quizController");
+const quizRoutes = require("./infrastructure/webApi/routes/quizRoutes");
 
 app.use(express.json());
 app.use(
@@ -139,6 +145,29 @@ async function initializeApp() {
     phoneInterviewUseCase
   );
 
+  const quizRepository = new MongoQuizRepository(
+    process.env.MONGODB_URL,
+    "jobs",
+    "quizzes"
+  );
+
+  const quizResponseRepository = new MongoQuizResponseRepository(
+    process.env.MONGODB_URL,
+    "jobs",
+    "quiz_responses"
+  );
+
+  const quizUseCases = new QuizUseCases(
+    quizRepository,
+    jobRepository,
+    ollamaService
+  );
+  const quizResponseUseCases = new QuizResponseUseCases(
+    quizResponseRepository,
+    quizRepository
+  );
+  const quizController = new QuizController(quizUseCases, quizResponseUseCases);
+
   // Routes
   app.use("/api/auth", authRoutes(authController));
   app.use("/api/users", userRoutes(userController));
@@ -150,6 +179,7 @@ async function initializeApp() {
     "/api/phone-interviews",
     phoneInterviewRoutes(phoneInterviewController)
   );
+  app.use("/api/quizzes", quizRoutes(quizController));
 
   // Serve static files from the public directory
   app.use(express.static(path.join(__dirname, "public")));
