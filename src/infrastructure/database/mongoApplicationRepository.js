@@ -1,5 +1,6 @@
 const { MongoClient, ObjectId } = require("mongodb");
 const Application = require("../../domain/entities/Application");
+const { User } = require("../../domain/entities/User");
 
 class MongoApplicationRepository {
   constructor(url, dbName, collectionName) {
@@ -22,7 +23,6 @@ class MongoApplicationRepository {
     try {
       await this.connect();
       const result = await this.collection.insertOne({
-        id: application.id,
         userId: application.userId,
         jobId: application.jobId,
         resumeFile: application.resumeFile,
@@ -32,7 +32,26 @@ class MongoApplicationRepository {
         createdAt: application.createdAt,
         updatedAt: application.updatedAt,
       });
-      return { ...application, id: result.insertedId };
+
+      const db = this.client.db(this.dbName);
+      const usersCollection = db.collection("users");
+      const user = await usersCollection.findOne({
+        _id: new ObjectId(application.userId),
+      });
+
+      return {
+        ...application,
+        id: result.insertedId,
+        user: user
+          ? {
+              id: user._id,
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              phoneNumber: user.phoneNumber,
+            }
+          : null,
+      };
     } catch (error) {
       console.error("Error creating application:", error);
       throw error;
@@ -50,7 +69,31 @@ class MongoApplicationRepository {
     const application = await this.collection.findOne({
       _id: new ObjectId(id),
     });
-    return application ? new Application(application) : null;
+
+    if (!application) {
+      return null;
+    }
+
+    const db = this.client.db(this.dbName);
+    const usersCollection = db.collection("users");
+    const user = await usersCollection.findOne({
+      _id: new ObjectId(application.userId),
+    });
+
+    const enrichedApplication = {
+      ...application,
+      user: user
+        ? {
+            id: user._id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            phoneNumber: user.phoneNumber,
+          }
+        : null,
+    };
+
+    return new Application(enrichedApplication);
   }
 
   async update(id, application) {
@@ -69,8 +112,32 @@ class MongoApplicationRepository {
 
   async findAll() {
     await this.connect();
+    const db = this.client.db(this.dbName);
+    const usersCollection = db.collection("users");
+
     const applications = await this.collection.find().toArray();
-    return applications.map((app) => app);
+
+    const enrichedApplications = await Promise.all(
+      applications.map(async (app) => {
+        const user = await usersCollection.findOne({
+          _id: new ObjectId(app.userId),
+        });
+        return {
+          ...app,
+          user: user
+            ? {
+                id: user._id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phoneNumber: user.phoneNumber,
+              }
+            : null,
+        };
+      })
+    );
+
+    return enrichedApplications;
   }
 
   async delete(id) {

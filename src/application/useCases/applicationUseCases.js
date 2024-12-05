@@ -40,6 +40,13 @@ class ApplicationUseCases {
     return this.applicationRepository.findAll();
   }
 
+  async getApplicationById(id) {
+    if (!id) {
+      throw new Error("Application ID is required");
+    }
+    return this.applicationRepository.findById(id);
+  }
+
   async deleteApplication(applicationId) {
     if (!applicationId) {
       throw new Error("Application ID is required");

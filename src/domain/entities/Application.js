@@ -9,6 +9,7 @@ class Application {
     score,
     createdAt,
     updatedAt,
+    user,
   }) {
     this._id = _id;
     this.userId = userId;
@@ -19,6 +20,7 @@ class Application {
     this.score = score;
     this.createdAt = createdAt || new Date();
     this.updatedAt = updatedAt || new Date();
+    this.user = user;
   }
 
   updateStatus(newStatus) {
