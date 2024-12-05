@@ -10,8 +10,20 @@ class UserUseCases {
   }
 
   async registerUser(userData) {
-    console.log("userdat", userData);
-    const { email, password, confirmPassword, userType } = userData;
+    const {
+      email,
+      password,
+      confirmPassword,
+      userType,
+      firstName,
+      lastName,
+      phoneNumber,
+      address,
+      linkedin,
+      companyName,
+      companyIndustry,
+      website,
+    } = userData;
 
     if (!validateEmail(email)) {
       throw new Error("Invalid email format");
@@ -36,8 +48,7 @@ class UserUseCases {
 
     switch (userType) {
       case "Company":
-        const { companyName, industry } = userData;
-        if (!companyName || !industry) {
+        if (!companyName || !companyIndustry) {
           throw new Error(
             "Company name and industry are required for company registration"
           );
@@ -45,32 +56,31 @@ class UserUseCases {
         newUser = new User(
           email,
           password,
-          userData.firstName || null,
-          userData.lastName || null,
-          userData.phoneNumber || null,
+          firstName,
+          lastName,
+          phoneNumber,
           userType,
-          userData.address || null,
-          userData.linkedin || null,
+          address,
+          linkedin,
           companyName,
           companyIndustry,
-          userData.website || null
+          website
         );
         break;
       case "User":
         newUser = new User(
           email,
-          userData.password || password,
-          userData.firstName || null,
-          userData.lastName || null,
-          userData.phoneNumber || null,
+          password,
+          firstName,
+          lastName,
+          phoneNumber,
           userType,
-          userData.address || null,
-          userData.linkedin || null,
-          userData.companyName || null,
-          userData.companyIndustry || null,
-          userData.website || null
+          address,
+          linkedin,
+          companyName,
+          companyIndustry,
+          website
         );
-        console.log("new user" + newUser);
         break;
       case "Admin":
         throw new Error(
@@ -80,7 +90,6 @@ class UserUseCases {
         throw new Error("Invalid user type");
     }
 
-    // Save the new user
     const savedUser = await this.userRepository.create(newUser);
     return savedUser;
   }

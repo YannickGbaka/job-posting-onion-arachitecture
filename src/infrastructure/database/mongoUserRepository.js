@@ -29,22 +29,22 @@ class MongoUserRepository {
 
   async findByEmail(email) {
     const user = await this.collection.findOne({ email });
-    return user
-      ? new User(
-          user._id.toString(),
-          user.email,
-          user.password,
-          user.firstName,
-          user.lastName,
-          user.phoneNumber,
-          user.userType,
-          user.address,
-          user.linkedin,
-          user.companyName,
-          user.companyIndustry,
-          user.website
-        )
-      : null;
+    if (!user) return null;
+
+    return new User(
+      user.email,
+      user.password,
+      user.firstName,
+      user.lastName,
+      user.phoneNumber,
+      user.userType,
+      user.address,
+      user.linkedin,
+      user.companyName,
+      user.companyIndustry,
+      user.website,
+      user._id.toString()
+    );
   }
 
   async findById(id) {
