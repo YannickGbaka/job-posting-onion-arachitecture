@@ -1,5 +1,14 @@
 class Job {
-  constructor(id, title, description, salary, location, requirements, jobType) {
+  constructor(
+    id,
+    title,
+    description,
+    salary,
+    location,
+    requirements,
+    jobType,
+    applicationDeadline
+  ) {
     this.id = id;
     this.title = title;
     this.description = description;
@@ -7,6 +16,7 @@ class Job {
     this.location = location;
     this.requirements = requirements;
     this.jobType = jobType;
+    this.applicationDeadline = applicationDeadline;
   }
 }
 

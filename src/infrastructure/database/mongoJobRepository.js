@@ -23,19 +23,19 @@ class MongoJobRepository {
 
   async create(job) {
     try {
-        // S'assurer que la connexion est établie
-        if (!this.client) {
-            await this.connect();
-        }
-        
-        // Validate that all required fields are present
-        this.validateJob(job);
+      // S'assurer que la connexion est établie
+      if (!this.client) {
+        await this.connect();
+      }
 
-        const result = await this.collection.insertOne(job);
-        return { ...job, id: result.insertedId.toString() };
+      // Validate that all required fields are present
+      this.validateJob(job);
+
+      const result = await this.collection.insertOne(job);
+      return { ...job, id: result.insertedId.toString() };
     } catch (error) {
-        console.error("Error creating job:", error);
-        throw error;
+      console.error("Error creating job:", error);
+      throw error;
     }
   }
 
@@ -43,15 +43,22 @@ class MongoJobRepository {
     const requiredFields = [
       "title",
       "description",
-      // "salary",
       "location",
       "requirements",
       "jobType",
+      "applicationDeadline",
     ];
+
     for (const field of requiredFields) {
       if (!job[field]) {
         throw new Error(`Job validation failed: ${field} is required`);
       }
+    }
+
+    // Validate deadline is a future date
+    const deadline = new Date(job.applicationDeadline);
+    if (isNaN(deadline.getTime()) || deadline < new Date()) {
+      throw new Error("Application deadline must be a valid future date");
     }
   }
 
@@ -66,7 +73,8 @@ class MongoJobRepository {
       job.salary,
       job.location,
       job.requirements,
-      job.jobType
+      job.jobType,
+      job.applicationDeadline
     );
   }
 
@@ -81,7 +89,8 @@ class MongoJobRepository {
           job.salary,
           job.location,
           job.requirements,
-          job.jobType
+          job.jobType,
+          job.applicationDeadline
         )
     );
   }
